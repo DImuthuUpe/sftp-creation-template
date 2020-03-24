@@ -20,6 +20,13 @@
                 "description": "Name of file share to be created"
             }
         },
+        "keyShareName": {
+            "type": "string",
+            "defaultValue": "keyshare",
+            "metadata": {
+                "description": "Name of public key share to be created"
+            }
+        },
         "sftpUser": {
             "type": "string",
             "metadata": {
