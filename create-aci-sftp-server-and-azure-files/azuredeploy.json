@@ -27,6 +27,13 @@
                 "description": "Name of public key share to be created"
             }
         },
+        "userStoreShareName": {
+            "type": "string",
+            "defaultValue": "userstoreshare",
+            "metadata": {
+                "description": "Name of user store share to be created"
+            }
+        },
         "sftpUser": {
             "type": "string",
             "metadata": {
@@ -57,8 +64,10 @@
     "variables": {
         "cliContainerName": "create-share",
         "keyCliContainerName": "create-key-share",
+        "userStoreCliContainerName": "create-ustore-share",
         "cliContainerGroupName": "create-share-group",
         "keyCliContainerGroupName": "create-key-share-group",
+        "userStoreCliContainerGroupName": "create-ustore-share-group",
         "cliContainerImage": "microsoft/azure-cli:latest",
         "sftpContainerName": "sftp",
         "sftpContainerGroupName": "sftp-group",
@@ -112,6 +121,51 @@
                                 "create",
                                 "--name",
                                 "[parameters('keyShareName')]"
+                            ],
+                            "environmentVariables": [
+                                {
+                                    "name": "AZURE_STORAGE_KEY",
+                                    "value": "[listKeys(variables('storageAccountName'),'2018-02-01').keys[0].value]"
+                                },
+                                {
+                                    "name": "AZURE_STORAGE_ACCOUNT",
+                                    "value": "[variables('storageAccountName')]"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "cpu": 1,
+                                    "memoryInGB": 1
+                                }
+                            }
+                        }
+                    }
+                ],
+                "restartPolicy": "OnFailure",
+                "osType": "Linux"
+            }
+        },
+        {
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "name": "[variables('userStoreCliContainerGroupName')]",
+            "apiVersion": "2018-04-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]"
+            ],
+            "properties": {
+                "containers": [
+                    {
+                        "name": "[variables('userStoreCliContainerName')]",
+                        "properties": {
+                            "image": "[variables('cliContainerImage')]",
+                            "command": [
+                                "az",
+                                "storage",
+                                "share",
+                                "create",
+                                "--name",
+                                "[parameters('userStoreShareName')]"
                             ],
                             "environmentVariables": [
                                 {
@@ -223,6 +277,11 @@
                                     "mountPath": "[concat('/home/', parameters('sftpUser'), '/.ssh/keys')]",
                                     "name": "keyvolume",
                                     "readOnly": false
+                                },
+                                {
+                                    "mountPath": "[concat('/etc/sftp')]",
+                                    "name": "usvolume",
+                                    "readOnly": false
                                 }
                             ]
                         }
@@ -255,6 +314,15 @@
                         "azureFile": {
                             "readOnly": false,
                             "shareName": "[parameters('keyShareName')]",
+                            "storageAccountName": "[variables('storageAccountName')]",
+                            "storageAccountKey": "[listKeys(variables('storageAccountName'),'2018-02-01').keys[0].value]"
+                        }
+                    },
+                    {
+                        "name": "usvolume",
+                        "azureFile": {
+                            "readOnly": false,
+                            "shareName": "[parameters('userStoreShareName')]",
                             "storageAccountName": "[variables('storageAccountName')]",
                             "storageAccountKey": "[listKeys(variables('storageAccountName'),'2018-02-01').keys[0].value]"
                         }
