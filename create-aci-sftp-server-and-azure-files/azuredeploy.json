@@ -220,7 +220,7 @@
                                     "readOnly": false
                                 },
                                 {
-                                    "mountPath": "[concat('/home/', parameters('sftpUser'), '/.ssh')]",
+                                    "mountPath": "[concat('/home/', parameters('sftpUser'), '/.ssh/keys')]",
                                     "name": "keyvolume",
                                     "readOnly": false
                                 }
