@@ -58,6 +58,7 @@
         "cliContainerName": "create-share",
         "keyCliContainerName": "create-key-share",
         "cliContainerGroupName": "create-share-group",
+        "keyCliContainerGroupName": "create-key-share-group:,
         "cliContainerImage": "microsoft/azure-cli:latest",
         "sftpContainerName": "sftp",
         "sftpContainerGroupName": "sftp-group",
@@ -92,6 +93,51 @@
         },
         {
             "type": "Microsoft.ContainerInstance/containerGroups",
+            "name": "[variables('keyCliContainerGroupName')]",
+            "apiVersion": "2018-04-01",
+            "location": "[parameters('location')]",
+            "dependsOn": [
+                "[variables('storageAccountName')]"
+            ],
+            "properties": {
+                "containers": [
+                    {
+                        "name": "[variables('keyCliContainerName')]",
+                        "properties": {
+                            "image": "[variables('cliContainerImage')]",
+                            "command": [
+                                "az",
+                                "storage",
+                                "share",
+                                "create",
+                                "--name",
+                                "[parameters('keyShareName')]"
+                            ],
+                            "environmentVariables": [
+                                {
+                                    "name": "AZURE_STORAGE_KEY",
+                                    "value": "[listKeys(variables('storageAccountName'),'2018-02-01').keys[0].value]"
+                                },
+                                {
+                                    "name": "AZURE_STORAGE_ACCOUNT",
+                                    "value": "[variables('storageAccountName')]"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "cpu": 1,
+                                    "memoryInGB": 1
+                                }
+                            }
+                        }
+                    }
+                ],
+                "restartPolicy": "OnFailure",
+                "osType": "Linux"
+            }
+        },
+        {
+            "type": "Microsoft.ContainerInstance/containerGroups",
             "name": "[variables('cliContainerGroupName')]",
             "apiVersion": "2018-04-01",
             "location": "[parameters('location')]",
@@ -111,36 +157,6 @@
                                 "create",
                                 "--name",
                                 "[parameters('fileShareName')]"
-                            ],
-                            "environmentVariables": [
-                                {
-                                    "name": "AZURE_STORAGE_KEY",
-                                    "value": "[listKeys(variables('storageAccountName'),'2018-02-01').keys[0].value]"
-                                },
-                                {
-                                    "name": "AZURE_STORAGE_ACCOUNT",
-                                    "value": "[variables('storageAccountName')]"
-                                }
-                            ],
-                            "resources": {
-                                "requests": {
-                                    "cpu": 1,
-                                    "memoryInGB": 1
-                                }
-                            }
-                        }
-                    },
-                    {
-                        "name": "[variables('keyCliContainerName')]",
-                        "properties": {
-                            "image": "[variables('cliContainerImage')]",
-                            "command": [
-                                "az",
-                                "storage",
-                                "share",
-                                "create",
-                                "--name",
-                                "[parameters('keyShareName')]"
                             ],
                             "environmentVariables": [
                                 {
