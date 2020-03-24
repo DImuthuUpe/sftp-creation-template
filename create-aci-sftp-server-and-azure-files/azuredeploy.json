@@ -218,6 +218,11 @@
                                     "mountPath": "[concat('/home/', parameters('sftpUser'), '/upload')]",
                                     "name": "sftpvolume",
                                     "readOnly": false
+                                },
+                                {
+                                    "mountPath": "[concat('/home/', parameters('sftpUser'), '/.ssh')]",
+                                    "name": "keyvolume",
+                                    "readOnly": false
                                 }
                             ]
                         }
