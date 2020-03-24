@@ -170,6 +170,11 @@
                                     "mountPath": "[concat('/home/', parameters('sftpUser'), '/upload')]",
                                     "name": "sftpvolume",
                                     "readOnly": false
+                                },
+                                {
+                                    "mountPath": "[concat('/home/', parameters('sftpUser'), '/.ssh')]",
+                                    "name": "keyvolume",
+                                    "readOnly": true
                                 }
                             ]
                         }
@@ -193,6 +198,15 @@
                         "azureFile": {
                             "readOnly": false,
                             "shareName": "[parameters('fileShareName')]",
+                            "storageAccountName": "[variables('storageAccountName')]",
+                            "storageAccountKey": "[listKeys(variables('storageAccountName'),'2018-02-01').keys[0].value]"
+                        }
+                    },
+                    {
+                        "name": "keyvolume",
+                        "azureFile": {
+                            "readOnly": false,
+                            "shareName": "[parameters('keyShareName')]",
                             "storageAccountName": "[variables('storageAccountName')]",
                             "storageAccountKey": "[listKeys(variables('storageAccountName'),'2018-02-01').keys[0].value]"
                         }
