@@ -58,7 +58,7 @@
         "cliContainerName": "create-share",
         "keyCliContainerName": "create-key-share",
         "cliContainerGroupName": "create-share-group",
-        "keyCliContainerGroupName": "create-key-share-group:,
+        "keyCliContainerGroupName": "create-key-share-group",
         "cliContainerImage": "microsoft/azure-cli:latest",
         "sftpContainerName": "sftp",
         "sftpContainerGroupName": "sftp-group",
